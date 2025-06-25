@@ -1,45 +1,45 @@
 import { useState } from 'react'
-import { v4 as uuidv4 } from 'uuid'
+import { useSelector, useDispatch } from 'react-redux'
 
 import TaskItem from './components/TaskItem'
+
+import { createTask, updateTask, deleteTask } from './redux/slices/task.slice'
 
 import './App.css'
 
 function App() {
-  const [taskList, setTaskList] = useState([])
-
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
 
+  const dispatch = useDispatch()
+
+  const { taskList } = useSelector((state) => state.task)
+
   const handleAddTask = (e) => {
     e.preventDefault()
-    const newTask = {
-      id: uuidv4(),
-      title: title,
-      content: content,
-    }
-    const newTaskList = [...taskList, newTask]
-    setTaskList(newTaskList)
+    dispatch(
+      createTask({
+        title: title,
+        content: content,
+      })
+    )
     // Clear input fields after adding a task
     setTitle('')
     setContent('')
   }
 
   const handleEditTask = (id, title, content) => {
-    const newTaskList = [...taskList]
-    const index = newTaskList.findIndex((item) => item.id === id)
-    const newTask = {
-      id: id,
-      title: title,
-      content: content,
-    }
-    newTaskList.splice(index, 1, newTask)
-    setTaskList(newTaskList)
+    dispatch(
+      updateTask({
+        id: id,
+        title: title,
+        content: content,
+      })
+    )
   }
 
   const handleDeleteTask = (id) => {
-    const newTaskList = taskList.filter((item) => item.id !== id)
-    setTaskList(newTaskList)
+    dispatch(deleteTask({ id: id }))
   }
 
   const renderTaskList = () => {
